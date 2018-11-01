@@ -1,0 +1,383 @@
+var Site = {
+
+	init: function() {
+		if ( $('#chart').length ) {
+			Site.charts();
+		}
+		Site.smoothscroll();
+		Site.widowFix();
+		// Site.reflow();
+		if ( $('#illustration-1').length ) {
+			Site.animate();
+		}
+		Site.parallax();
+		Site.mobileMenu();
+		Site.carousel()
+		Site.externalLinks()
+	},
+	externalLinks: function(){
+		$('a[rel="external"]').click(function(event) {
+           event.preventDefault();
+           event.stopPropagation();
+           window.open(this.href, '_blank');
+       });
+	},
+	carousel: function(){
+		$('.carousel').slick({
+			autoplay: true,
+			dots: true,
+		})
+	},
+	mobileMenu: function(){
+		$('.menu-toggle').click(function(){
+			$(this).toggleClass('is-active')
+			$('.mobile-menu').toggleClass('is-active')
+		});
+
+		$('.mobile-menu a').click(function(){
+			$('.menu-toggle').removeClass('is-active')
+			$('.mobile-menu').removeClass('is-active')
+		})
+	},
+	parallax: function(){
+		$(window).scroll(function(e){
+			var scrolled = $(window).scrollTop();
+		    $('.parallax').each(function(){
+		    	var offset = $(this).offset().top;
+			    $(this).css('background-position', '0 ' + ((scrolled - offset) * -0.2) + 'px');
+		    })
+		});
+	},
+	charts: function() {
+		var lineLabels = new Array(7);
+
+		function getLineData() {
+			var arr = [];
+			for (var i=0, t=7; i<t; i++) {
+				arr.push(Math.floor(Math.random() * (10) + 1)*10)
+			}
+			return arr;
+		}
+
+		  // set all values to zero first
+		  function initialLineData() {
+		  	return [0,0,0,0,0,0,0,100];
+		  }
+
+		  var data = {
+		  	labels: lineLabels,
+		  	datasets: [{
+		  		type: 'line',
+		  		label: "My First dataset",
+		  		fill: false,
+		  		borderColor: "rgba(255,255,255,0.1)",
+		  		borderWidth: 2,
+		  		pointBackgroundColor: "rgba(220,220,220,0.1)",
+		  		tension: 0,
+		  		data: initialLineData(),
+		  	}, {
+		  		type: 'line',
+		  		label: "My Second dataset",
+		  		fill: false,
+		  		borderColor: "rgba(3,169,244,0.3)",
+		  		borderWidth: 2,
+		  		pointBackgroundColor: "rgba(3,169,244,0.3)",
+		  		tension: 0,
+		  		data: initialLineData(),
+		  	}]
+		  };
+
+		  var barLabels = new Array(40);
+
+		  function barValues() {
+		  	var values = [];
+		  	for (var i=0, t=40; i<t; i++) {
+		  		values.push(Math.round(Math.random() * t))
+		  	}
+		  	return values;
+		  }
+
+		  function initialBarValues() {
+		  	var values = [];
+		  	for (var i=0, t=40; i<t; i++) {
+		  		values.push(0);
+		  	}
+		  	values.push(100);
+		  	return values;
+		  }
+
+		  var barData = {
+		  	labels: barLabels,
+		  	datasets: [{
+		  		type: 'bar',
+		  		label: "third dataset",
+		  		fill: true,
+		  		backgroundColor: 'rgba(3,169,244,0.1)',
+		  		borderColor: '#fff',
+		  		data: initialBarValues(),
+		  	}]
+		  }
+
+		  var options = {
+		  	animation: {
+		      // easing: 'linear'
+		  },
+		  events: false,
+		    // responsive: true,
+		    legend: {
+		    	display: false,
+		    },
+		    scales: {
+		    	xAxes: [{
+		    		display: false,
+		    		gridLines: {
+		    			display: false
+		    		},
+		    		labels: {
+		    			show: false,
+		    		},
+		    		ticks: {
+		    			beginAtZero: true,
+		    			min: 0,
+		    			max: 100
+		    		}
+		    	}],
+		    	yAxes: [{
+		    		type: "linear",
+		    		display: false,
+		    		id: "y-axis-1",
+		    		gridLines: {
+		    			display: false
+		    		},
+		    		labels: {
+		    			show: false,
+		    		}
+		    	}, {
+		    		type: "linear",
+		    		display: false,
+		    		id: "y-axis-2",
+		    		gridLines: {
+		    			display: false
+		    		},
+		    		labels: {
+		    			show: false,
+		    		},
+		    		ticks: {
+		    			beginAtZero: true,
+		    		}
+		    	}]
+		    }
+		}
+
+
+		  // initialize charts
+		  var ctx = $("#chart").get(0).getContext("2d");
+		  var ctx2 = $("#chart2").get(0).getContext("2d");
+
+		  var myLineChart = new Chart(ctx, {
+		  	type: 'line',
+		  	data: data,
+		  	options: options,
+		  });
+
+		  var myBarChart = new Chart(ctx2, {
+		  	type: 'bar',
+		  	data: barData,
+		  	options: options,
+		  });
+
+		  // animate bar chart
+		  function animateBarChart() {
+		  	myBarChart.data.datasets[0].data = barValues();
+		  	myBarChart.update(30000, true);
+		  }
+		  setTimeout(function(){
+		  	animateBarChart();
+		  }, 100);
+		  // animateBarChart();
+
+		  // setInterval(function(){
+		  //   animateBarChart();
+		  // }, 9000);
+
+
+		  // animate line chart
+		  var counter = 0,
+		  interval;
+		  function animateLineChart() {
+		  	myLineChart.data.datasets[0].data = getLineData();
+		  	myLineChart.data.datasets[1].data = getLineData();
+		  	myLineChart.update(5000*(counter+1), true);
+
+		  	if ( counter > 1 ) {
+		  		clearInterval(interval);
+		  	}
+		  	counter++;
+		  }
+		  setTimeout(function(){
+		  	animateLineChart();
+		  }, 100);
+		  // animateLineChart();
+
+		  var interval = setInterval(function(){
+		  	animateLineChart();
+
+		  }, 5000);
+
+	},
+	embedSVGs: function() {
+		$('img.svg').each(function(){
+		    var $img = $(this),
+		    	imgID = $img.attr('id'),
+		    	imgClass = $img.attr('class'),
+		    	imgURL = $img.attr('src');
+
+		    $.get(imgURL, function(data) {
+		        var $svg = jQuery(data).find('svg');
+
+		        if(typeof imgID !== 'undefined') {
+		            $svg = $svg.attr('id', imgID);
+		        }
+		        if(typeof imgClass !== 'undefined') {
+		            $svg = $svg.attr('class', imgClass+' replaced-svg');
+		        }
+		        $svg = $svg.removeAttr('xmlns:a');
+		        $img.replaceWith($svg);
+		    }, 'xml');
+		});
+	},
+	getViewportOffset: function($e) {
+	  var $window = $(window),
+	    scrollLeft = $window.scrollLeft(),
+	    scrollTop = $window.scrollTop(),
+	    offset = $e.offset(),
+	    rect1 = { x1: scrollLeft, y1: scrollTop, x2: scrollLeft + $window.width(), y2: scrollTop + $window.height() },
+	    rect2 = { x1: offset.left, y1: offset.top, x2: offset.left + $e.width(), y2: offset.top + $e.height() };
+	  return {
+	    left: offset.left - scrollLeft,
+	    top: offset.top - scrollTop,
+	    insideViewport: rect1.x1 < rect2.x2 && rect1.x2 > rect2.x1 && rect1.y1 < rect2.y2 && rect1.y2 > rect2.y1
+	  };
+	},
+	animate: function() {
+		Site.embedSVGs();
+
+
+		$(window).on('scroll', function(e) {
+
+			// illustration 1
+
+			var element1 = $('#illustration-2');
+			var element1Offset = Site.getViewportOffset(element1);
+
+			if (element1Offset.insideViewport) {
+
+				var scrollPercentage1 = (100 - (element1Offset.top / $(window).height())*100);
+
+				var dots1 = $('svg g[class="dots-1"]'),
+					dots2 = $('svg g[class="dots-2"]'),
+					dots3 = $('svg g[class="dots-3"]');
+
+				var scale = (scrollPercentage1/100);
+
+				var cx = -529.2,
+					cy = 407.065;
+
+				$(dots1).attr("transform", "matrix("+scale+",0,0,"+scale+","+( cx-(scale*cx) )+","+( cy-(scale*cy) )+")");
+				$(dots2).attr("transform", "matrix("+scale+",0,0,"+scale+","+( cx-(scale*cx) )+","+( cy-(scale*cy) )+")");
+				// $(dots3).attr("transform", "matrix("+scale3+",0,0,"+scale3+","+( cx-(scale3*cx) )+","+( cy-(scale3*cy) )+")");
+
+			}
+
+
+			// illustration 2
+
+			var element2 = $('#illustration-1');
+			var element2Offset = Site.getViewportOffset(element2);
+
+			if (element2Offset.insideViewport) {
+
+				var scrollPercentage2 = (100 - (element2Offset.top / $(window).height())*100);
+
+				var arrow = $('svg g[class="arrow"]');
+				var gague = $('svg g[class="gague"]');
+
+				// $(selector).attr("transform", "rotate(" + (scrollPercentage2*1.8) + " -485 409)");
+				$(arrow).attr("transform", "rotate(" + (scrollPercentage2*1.8) + " -484.6 408.6)");
+				$(gague).attr("transform", "rotate(-" + (scrollPercentage2) + " -484.6 408.6)");
+
+			}
+
+
+			// illustration 3
+
+			var element3 = $('#illustration-3');
+			var element3Offset = Site.getViewportOffset(element3);
+
+			if (element3Offset.insideViewport) {
+
+				var scrollPercentage3 = (100 - (element3Offset.top / $(window).height())*100);
+				var gear1 = $('svg path[class="gear-1"]');
+				var gear2 = $('svg path[class="gear-2"]');
+				var gear3 = $('svg path[class="gear-3"]');
+
+				$(gear1).attr("transform", "rotate(" + (scrollPercentage3) + " 22.125 23.8)");
+				$(gear2).attr("transform", "rotate(-" + (scrollPercentage3*1.8) + " 8 41.7)");
+				$(gear3).attr("transform", "rotate(" + (scrollPercentage3*3.6) + " 23.1 47.6)");
+
+			}
+
+			// illustration 4
+
+			var element4 = $('#illustration-4');
+			var element4Offset = Site.getViewportOffset(element4);
+
+			if (element4Offset.insideViewport) {
+
+				var scrollPercentage4 = (100 - (element4Offset.top / $(window).height())*100);
+				var chart1 = $('svg g[class="chart1"]');
+
+				$(chart1).attr("transform", "rotate(" + (scrollPercentage4) + " 88.9 36)");
+
+			}
+		});
+	},
+	reflow: function() {
+		$('img').on('load', function () {
+			$(document).foundation('equalizer', 'reflow');
+		});
+	},
+	smoothscroll: function() {
+		$('a[href*=\\#]:not([href=\\#])').click(function() {
+			if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+				var target = $(this.hash);
+				target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				if (target.length) {
+					$('html,body').animate({
+						scrollTop: target.offset().top
+					}, 1000);
+					return false;
+				}
+			}
+		});
+	},
+	widowFix: function() {
+		$('.widowfix').each(function(){
+		    var string = $(this).html();
+		    string = string.replace(/ ([^ ]*)$/,'&nbsp;$1');
+		    $(this).html(string);
+		});
+	}
+}
+
+$(document).ready(function(){
+	Site.init();
+});
+
+// $(document).foundation();
+
+$('input').keypress(function(event) {
+  if (event.which == 13) {
+    event.preventDefault();
+  }
+});
